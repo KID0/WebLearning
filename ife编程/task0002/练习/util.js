@@ -6,6 +6,6 @@ function isFunction(fn) {
 	return ((typeof fn) == function);
 }
 
-function cloneObject(src) {
-    
+function isEmail(emailStr) {
+    var re = /^(\w+)+\@+(.+)/i;
 }
