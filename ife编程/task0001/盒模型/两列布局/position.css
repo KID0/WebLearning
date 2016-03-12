@@ -1,0 +1,19 @@
+#container {/*自动适配*/
+			height: 900px;
+			width: 100%;
+			border: green solid 3px;
+		}
+#divA {
+	background-color: red;
+	height: 400px;
+	width: 300px;
+	position: absolute;/*只要在这里加上“absolute”，A，B自动同行*/
+}
+#divB {/*自动适配*/
+	background-color: blue;
+	height: 400px;
+}
+#divC {/*自动适配*/
+	background-color: yellow;
+	height: 500px;
+}
