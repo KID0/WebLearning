@@ -1,0 +1,26 @@
+#container {
+			border: solid 3px green;
+			position: relative;
+			height: 300px;
+			width: 100%;
+}
+#divA {
+	background-color: red;
+	height: 300px;
+	width: 200px;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+#divB {
+	background-color: blue;
+	height: 300px;
+}
+#divC {
+	background-color: yellow;
+	height: 300px;
+	width: 200px;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
