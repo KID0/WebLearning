@@ -2,8 +2,8 @@
 
 - `mediaquery`考虑了媒体响应的问题，针对不同的屏幕大小给出了不同的CSS
 - `starbuzz_1`和`starbuzz_2`建立了近乎相同的页面,差别在于
-	+ `starbuzz_1`使用了&ltnav&gt&lt&fraslnav&gt
-	+ `starbuzz_2`使用了&ltdiv id=&quotnav&rdquo&gt&lt&frasldiv&gt
+	+ `starbuzz_1`使用了`<nav></nav>`
+	+ `starbuzz_2`使用了`<div id="nav"></div>`
 
 虽然页面显示近乎相同，但是为内容增添的属性，更加便于搜索引擎的识别以及维护
 
