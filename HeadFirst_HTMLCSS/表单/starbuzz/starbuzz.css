@@ -12,18 +12,18 @@ body {
 	Affects the 3 #header rules for the main header below
 	In HTML: add class="top" to main header in index.html and blog.html
 */
-
+/*这些不影响*/
 header.top {
   background-color: #675c47;
   margin: 10px 10px 0px 10px;
   height:           108px;
 }
-
+/*这些不影响*/
 header.top img#headerSlogan {
 	float: right;
 }
 
-
+/*这些不影响*/
 /* nav new in blog */
 nav {
     background-color: #efe5d0;
@@ -38,17 +38,16 @@ nav ul li {
 	display: inline;
 	padding: 5px 10px 5px 10px;
 }
-
-
+/*这些不影响*/
 div#tableContainer {
 	display: table;
 	border-spacing: 10px;
 }
-
+/*这些不影响*/
 div#tableRow {
 	display: table-row;
 }
-
+/*这些不影响*/
 section#drinks {
     display: table-cell;
     background-color: #efe5d0;
@@ -56,7 +55,7 @@ section#drinks {
     padding: 15px;
     vertical-align: top;
 }
-
+/*这些不影响*/
 /* added section#blog for blog */
 section#main, section#blog {
   display: table-cell;
@@ -65,7 +64,7 @@ section#main, section#blog {
   padding:          15px;
   vertical-align: top;
 }
-
+/*这些不影响*/
 aside {
   display: table-cell;
   background:       #efe5d0 url(images/background.gif) bottom right;
@@ -73,7 +72,7 @@ aside {
   padding:          15px;
   vertical-align: top;
 }
-
+/*这些不影响*/
 footer {
   background-color: #675c47;
   color:            #efe5d0;
@@ -82,14 +81,14 @@ footer {
   margin: 0px 10px 10px 10px;
   font-size:        90%;
 }
-
+/*开始有用了！！！*/
 h1 {
   font-size:        120%;
   color:            #954b4b;
 }
 
 h2 { font-size: 110%; }
-
+/*这些不影响*/
 .slogan { color: #954b4b; }
 
 .beanheading {
