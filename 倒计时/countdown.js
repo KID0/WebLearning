@@ -30,10 +30,10 @@ window.onload = function(){//主体函数，设置初始化及更新，渲染
     RADIUS = Math.round((WINDOW_WIDTH*4/5/108))-1;
 
     MARGIN_TOP = Math.round(WINDOW_HEIGHT/5);
-//以下两句固定格式，取得画布，获准在画布上涂鸦
+	//以下两句固定格式，取得画布，获准在画布上涂鸦
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
-//设置画布大小
+	//设置画布大小
     canvas.width = WINDOW_WIDTH;
     canvas.height = WINDOW_HEIGHT;
 
@@ -65,8 +65,8 @@ function update(){
     var curMinutes = parseInt((curShowTimeSeconds - curHours * 3600) / 60);
     var curSeconds = parseInt(curShowTimeSeconds % 60);
 
-//每隔一秒增加一次球（见效果），在不同的时间点增加的球位置数量不同
-//如果时间发生变化，出现新球，然后将时间统一，等待更新
+	//每隔一秒增加一次球（见效果），在不同的时间点增加的球位置数量不同
+	//如果时间发生变化，出现新球，然后将时间统一，等待更新
     if(nextSeconds != curSeconds){
         //以下六个if分别判断的是时分秒的十位和个位；
         if(parseInt(curHours%10) != parseInt(nextHours%10)){
