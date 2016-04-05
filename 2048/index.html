@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>2048</title>
+	<style type="text/css">
+		* {margin: 0;padding: 0;}
+		#main {
+			width: 400px;
+			height: 400px;
+			margin: 20px;
+			background-color: blue;
+		}
+		.box {
+			height: 80px;
+			width: 80px;
+			margin: 10px;
+			background-color: white;
+			float: left;
+			font-size: 4em;
+			text-align: center;
+			line-height: 80px;
+		}
+	</style>
+</head>
+<body>
+	<div id="main">
+		<div id="0" class="box"></div>
+		<div id="1" class="box"></div>
+		<div id="2" class="box"></div>
+		<div id="3" class="box"></div>
+		<div id="4" class="box"></div>
+		<div id="5" class="box"></div>
+		<div id="6" class="box"></div>
+		<div id="7" class="box"></div>
+		<div id="8" class="box"></div>
+		<div id="9" class="box"></div>
+		<div id="10" class="box"></div>
+		<div id="11" class="box"></div>
+		<div id="12" class="box"></div>
+		<div id="13" class="box"></div>
+		<div id="14" class="box"></div>
+		<div id="15" class="box"></div>
+	</div>
+	<script type="text/javascript">
+		// 一个数组，对应各个div的数值，初始化为0
+		// var arr = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+		var arr = [2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+		// 新增加的数字只能从newNum数组中获得；
+		var newNum = [2,4];
+
+		// 显示函数：使arr数组映射到div中
+		// 所以，其他函数只需要操作arr数组即可
+		function showNum() {
+			// 每次使用前先格式化
+			for (var i = 0; i < arr.length; i++) {
+				var div = document.getElementById(i);
+				div.innerHTML = "";
+				if (arr[i]) {
+					div.innerHTML = arr[i];
+				}
+			}
+		}
+
+		// 使arr中增加一个正数，数字只能来自newNum数组
+		function ShowNewNum() {
+			// 随机一个新增数字
+			var num = newNum[Math.floor(Math.random()*newNum.length)];
+			// 这里的1000是随便取得，足够大即可
+			for (var j = 0; j < 1000; j++) {
+				var i = Math.floor(Math.random()*arr.length);
+				// 只有这个div中是空白，才予以替换；
+				if (!arr[i]) {
+					arr[i] = num;
+					// 此处的break会跳出最内层的loop(if语句不是loop啦)
+					break;
+				}
+			}
+		}
+
+		// 运算操作：输入一行，相邻且相同的数字合并相加，结果显示在左边的div
+		function operation(arrLine) {
+			// 处理这一行的数字的运算
+			for (var j = 0; j < arrLine.length; j++) {
+				if (arrLine[j]) {
+					// 穷举这一个数字后面的数字
+					for (var k = (j + 1); k < (arrLine.length); k++) {
+						// 如果后面紧跟着一个不同的数字,跳出
+						if (arrLine[k] && (arrLine[k] != arrLine[j])) break;
+						// 如果两数字相等，处理
+						if (arrLine[k] == arrLine[j]) {
+							arrLine[j] = 2 * arrLine[j];
+							arrLine[k] = 0;
+						}
+					}
+				}
+			}
+			return arrLine;
+		}
+
+		// 位置操作：输入一行，将所有数字靠左边
+		function relocation(arrLine) {
+			var newArr = [];
+			for (var i = 0; i < arrLine.length; i++) {
+				if (arrLine[i]) {
+					newArr.push(arrLine[i]);
+				}
+			}
+			var numOfZero = arrLine.length - newArr.length;
+			for (var i = 0; i < numOfZero; i++) {
+				newArr.push(0);
+			}
+			return newArr;
+		}
+
+
+		// 当按下左方向键，arr数组重排
+		function keyLeft() {
+			var newArr = [];
+			// 拆分数组成单行
+			for (var i = 0; i < arr.length; i += 4) {
+				var arrLine = arr.slice(i,i+4);
+				// 运算处理
+				arrLine = operation(arrLine);
+				// 位置运算
+				arrLine = relocation(arrLine);
+				// 连接数组
+				newArr = newArr.concat(arrLine);
+				
+			}
+			// 将新的数组赋值给arr
+			for (var k = 0; k < arr.length; k++){
+				arr[k] = newArr[k];
+			}
+			
+		}
+
+		// 将数组arr左右镜像
+		function arrLeftRight() {
+			var newArr = [];
+			for (var i = 0; i < arr.length; i += 4) {
+				var arrLine = arr.slice(i,i+4);
+				arrLine.reverse();
+				newArr = newArr.concat(arrLine);
+			}
+			for (var k = 0; k < arr.length; k++){
+				arr[k] = newArr[k];
+			}
+		}
+		// 数组上下镜像
+		function arrUpDown() {
+			var newArr = [];
+			for (var i = 0; i < 4; i++) {
+				newArr[i+12] = arr[i];
+				newArr[i] = arr[i+12];
+			}
+			for (var i = 4; i < 8; i++) {
+				newArr[i+4] = arr[i];
+				newArr[i] = arr[i+4];
+			}
+			for (var i = 0; i < newArr.length; i++) {
+				arr[i] = newArr[i];
+			}
+		}
+
+		// 当按下右方向键，arr左右镜像，使用keyLeft()，然后再次左右镜像
+		function keyRight() {
+			arrLeftRight();
+			keyLeft();
+			arrLeftRight();
+		}
+
+		// arr数组变换
+		// [1,2,3,4] --> [[1,2],[3,4]]
+		function arr16To44() {
+			var newArr = [[],[],[],[]];
+			for (var i = 0,j = 0; i < arr.length; i += 4,j++) {
+				arrLine = arr.slice(i , (i+4));
+				newArr[j] = newArr[j].concat(arrLine);
+			}
+			// 数字的初始化一定要在loop外面进行，第二次犯这个错误了
+			arr = [[],[],[],[]];
+			for (var i = 0; i < newArr.length; i++) {				
+				arr[i] = arr[i].concat(newArr[i]);
+			}
+		}
+
+		// arr数组变换
+		// [[1,2],[3,4]] --> [1,2,3,4]
+		function arr44To16() {
+			newArr = [];
+			for (var i = 0; i < arr.length; i++) {
+				for (var j = 0; j < arr[i].length; j++) {
+					newArr.push(arr[i][j]);
+				}
+			}
+			arr = [];
+			for (var k = 0; k < newArr.length; k++){
+				arr[k] = newArr[k];
+			}
+		}
+
+		// 当arr呈现[[1,2],[3,4]]形式时，使用这个函数使得数组左右对调
+		function arrLeftRight2() {
+			var newArr = [[],[],[],[]];
+			for (var i = 0; i < arr.length; i++) {
+				for (var j = 0; j < arr.length; j++) {
+					newArr[i][arr.length - j - 1] = arr[i][j];
+				}
+			}
+			arr = [[],[],[],[]];
+			for (var i = 0; i < newArr.length; i++) {				
+				arr[i] = arr[i].concat(newArr[i]);
+			}
+		}
+		// 当arr呈现[[1,2],[3,4]]形式时,这个函数使数组顺时针旋转90度
+		function arrClockWise90() {
+			var newArr = [[],[],[],[]];
+			for (var i = 0; i < arr.length; i++) {
+				for (var j = 0; j < arr.length; j++) {
+					newArr[i][j] = arr[j][i];
+				}
+			}
+			arr = [[],[],[],[]];
+			for (var i = 0; i < newArr.length; i++) {				
+				arr[i] = arr[i].concat(newArr[i]);
+			}
+			arrLeftRight2();
+		}
+
+		function keyUp() {
+			arr16To44();
+			arrClockWise90();
+			arr44To16();
+			keyRight();
+			arr16To44();
+			arrClockWise90();
+			arrClockWise90();
+			arrClockWise90();
+			arr44To16();
+		}
+
+		function keyDown() {
+			arrUpDown();
+			keyUp();
+			arrUpDown();
+		}
+
+		// 键盘事件监听
+		// 37 left
+		// 38 up
+		// 39 right
+		// 40 down
+		document.onkeyup = function(event){
+			if (event.keyCode == 37) {
+				keyLeft();
+				ShowNewNum();
+				showNum();
+			}
+			if (event.keyCode == 39) {
+				keyRight();
+				ShowNewNum();
+				showNum();
+			}
+			if (event.keyCode == 38) {
+				keyUp();
+				ShowNewNum();
+				showNum();
+			}
+			if (event.keyCode == 40) {
+				keyDown();
+				ShowNewNum();
+				showNum();
+			}
+		}
+
+		window.onload = showNum();
+	</script>
+</body>
+</html>
