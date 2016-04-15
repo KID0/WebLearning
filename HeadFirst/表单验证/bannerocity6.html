@@ -1,0 +1,170 @@
+<html>
+  <head>
+    <title>Bannerocity - Personalized Online Sky Banners</title>
+    <link rel="stylesheet" type="text/css" href="bannerocity.css" />
+    <script type="text/javascript">
+      
+      // 正则验证内容是否准确，显示/隐藏提示
+      function validateRegEx(regex, input, helpText, helpMessage) {
+        // See if the input data validates OK
+        // RegExpObject.test(string)：检验是否匹配，返回true or false
+        // 如果匹配失败
+        if (!regex.test(input)) {
+          // The data is invalid, so set the help message and return false
+          // helpText是每个div中的span节点，helpMessage是节点中显示的内容
+          // 如果有显示helpMessage的位置
+          if (helpText != null)
+            helpText.innerHTML = helpMessage;
+          return false;
+        }
+
+        else {
+          // The data is OK, so clear the help message and return true
+          // 匹配成功，清除帮助信息
+          // 如果有显示helpMessage的位置
+          if (helpText != null)
+            helpText.innerHTML = "";
+          return true;
+        }
+      }
+
+
+      // 验证输入是否为空
+      function validateNonEmpty(inputField, helpText) {
+        // See if the input value contains any text
+        return validateRegEx(/.+/,
+          inputField.value, helpText,
+          "Please enter a value.");
+      }
+
+      // 验证输入文本的长度
+      function validateLength(minLength, maxLength, inputField, helpText) {
+        // See if the input value contains at least minLength but no more than maxLength characters
+        return validateRegEx(new RegExp("^.{" + minLength + "," + maxLength + "}$"),
+          inputField.value, helpText,
+          "Please enter a value " + minLength + " to " + maxLength +
+          " characters in length.");
+      }
+
+      // 以下函数用于验证各个输入
+      // 基本格式都一样，最大的不同就是正则
+      function validateZipCode(inputField, helpText) {
+        // First see if the input value contains data
+        /*如果数据为空，validateNonEmpty()函数返回了“false”，同时此函数也运行了，因此help有显示*/
+        // 函数的嵌套调用，这里水好深
+        if (!validateNonEmpty(inputField, helpText))
+          return false;
+
+        // Then see if the input value is a ZIP code
+        return validateRegEx(/^\d{5}$/,
+          inputField.value, helpText,
+          "Please enter a 5-digit ZIP code.");
+      }
+
+      function validateDate(inputField, helpText) {
+        // First see if the input value contains data
+        if (!validateNonEmpty(inputField, helpText))
+          return false;
+
+        // Then see if the input value is a date
+        return validateRegEx(/^\d{2}\/\d{2}\/(\d{2}|\d{4})$/,
+          inputField.value, helpText,
+          "Please enter a date (for example, 01/14/1975).");
+      }
+
+      function validatePhone(inputField, helpText) {
+        // First see if the input value contains data
+        if (!validateNonEmpty(inputField, helpText))
+          return false;
+
+        // Then see if the input value is a phone number
+        return validateRegEx(/^\d{3}-\d{3}-\d{4}$/,
+          inputField.value, helpText,
+          "Please enter a phone number (for example, 123-456-7890).");
+      }
+
+      function validateEmail(inputField, helpText) {
+        // First see if the input value contains data
+        if (!validateNonEmpty(inputField, helpText))
+          return false;
+
+        // Then see if the input value is an email address
+        // 正则中"-"意义不明
+        return validateRegEx(/^[\w\.-_\+]+@[\w-]+(\.\w{2,3})+$/,
+          inputField.value, helpText,
+          "Please enter an email address (for example, johndoe@acme.com).");
+      }
+
+      // 验证表单+提交表单
+      function placeOrder(form) {
+        // 前面只是给出了提示，阻止还要判定一次
+        // HTML5的表单系统似乎更加好用一些
+        if (validateLength(1, 32, form["message"], form["message_help"]) &&
+          validateZipCode(form["zipcode"], form["zipcode_help"]) &&
+          validateDate(form["date"], form["date_help"]) &&
+          validateNonEmpty(form["name"], form["name_help"]) &&
+          validatePhone(form["phone"], form["phone_help"]) &&
+          validateEmail(form["email"], form["email_help"])) {
+          // Submit the order to the server
+          form.submit();
+        } else {
+          alert("I'm sorry but there is something wrong with the order information.");
+        }
+      }
+    </script>
+  </head>
+
+  <!-- 页面一载入就将焦点放在第一个输入框内（message） -->
+  <body onload="document.getElementById('message').focus()">
+    <!-- logo -->
+    <div class="heading">
+      <img id="logo" src="logo.png" alt="Bannerocity" />
+    </div>
+
+    <!-- the form we need -->
+    <form name="orderform" action="bannerocity.php" method="POST">
+      <!-- all are (div class="field") -->
+      <div class="field">
+        <!-- bare word, if you want to unit the style of those words,you should give them a lable so that we can add css -->
+        Enter the banner message:
+        <!-- 焦点移开会验证相应属性 -->
+        <input id="message" name="message" type="text" size="32"
+          onblur="validateLength(1, 32, this, document.getElementById('message_help'))" />
+        <span id="message_help" class="help"></span>
+      </div>
+      <div class="field">
+        Enter ZIP code of the location:
+        <input id="zipcode" name="zipcode" type="text" size="5"
+          onblur="validateZipCode(this, document.getElementById('zipcode_help'))" />
+        <span id="zipcode_help" class="help"></span>
+      </div>
+      <div class="field">
+        Enter the date for the message to be shown:
+        <input id="date" name="date" type="text" size="10"
+          onblur="validateDate(this, document.getElementById('date_help'))" />
+        <span id="date_help" class="help"></span>
+      </div>
+      <div class="field">
+        Enter your name:
+        <input id="name" name="name" type="text" size="32"
+          onblur="validateNonEmpty(this, document.getElementById('name_help'))" />
+        <span id="name_help" class="help"></span>
+      </div>
+      <div class="field">
+        Enter your phone number:
+        <input id="phone" name="phone" type="text" size="12"
+          onblur="validatePhone(this, document.getElementById('phone_help'))" />
+        <span id="phone_help" class="help"></span>
+      </div>
+      <div class="field">
+        Enter your email address:
+        <input id="email" name="email" type="text" size="32"
+          onblur="validateEmail(this, document.getElementById('email_help'))" />
+        <span id="email_help" class="help"></span>
+      </div>
+      <!-- 提交表单按钮，点击会调用函数 -->
+      <!-- 这个“this”总是耐人寻味 -->
+      <input type="button" value="Order Banner" onclick="placeOrder(this.form);" />
+    </form>
+  </body>
+</html>
