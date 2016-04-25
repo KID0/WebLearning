@@ -1,0 +1,207 @@
+<html>
+  <head>
+    <title>YouCube - The Blog for Cube Puzzlers</title>
+
+    <script type="text/javascript" src="ajax.js"> </script>
+    <script type="text/javascript" src="date.js"> </script>
+    <script type="text/javascript">
+      // Custom Date function to display a date in MM/DD/YYYY format
+      // 这个函数和"date.js"重复了啊！
+      Date.prototype.shortFormat = function() {
+        return (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear();
+      }
+
+      // Blog object constructor
+      // 定义一个对象，不解释
+      function Blog(body, date, image) {
+        // Assign the properties
+        this.body = body;
+        this.date = date;
+        this.image = image;
+      }
+
+      // Return a string representation of the blog entry
+      Blog.prototype.toString = function() {
+        return "[" + this.date.shortFormat() + "] " + this.body;
+      };
+
+      // Return a formatted HTML representation of the blog entry
+      Blog.prototype.toHTML = function(highlight) {
+        // Use a gray background as a highlight, if specified
+        var blogHTML = "";
+        blogHTML += highlight ? "<p style='background-color:#EEEEEE'>" : "<p>";
+
+        // Generate the formatted blog HTML code
+        if (this.image) {
+          blogHTML += "<strong>" + this.date.shortFormat() + "</strong><br /><table><tr><td><img src='" +
+            this.image + "'/></td><td style='vertical-align:top'>" + this.body + "</td></tr></table><em>" +
+            this.signature + "</em></p>";
+        }
+        else {
+          blogHTML += "<strong>" + this.date.shortFormat() + "</strong><br />" + this.body +
+            "<br /><em>" + this.signature + "</em></p>";
+        }
+        return blogHTML;
+      };
+
+      // See if the blog body contains a string of text
+      Blog.prototype.containsText = function(text) {
+        return (this.body.toLowerCase().indexOf(text.toLowerCase()) != -1);
+      };
+
+      // Set the blog-wide signature
+      Blog.prototype.signature = "by Puzzler Ruby";
+
+      // Sort helper to sort blog entries in reverse chronological order (most recent first)
+      Blog.blogSorter = function(blog1, blog2) {
+        return blog2.date - blog1.date;
+      };
+
+      // Global array of blog entries
+      // 这个数组用于搜集所有的blog实体
+      var blog = new Array();
+
+      // Global Ajax request
+      var ajaxReq = new AjaxRequest();
+
+      // Load the blog from an XML doc on the server using Ajax
+      function loadBlog() {
+        document.getElementById("blog").innerHTML = "<img src='wait.gif' alt='Loading...' />";
+        // 这里的send()为AjaxRequest中的方法，不要与XMLHttpRequest中的send()搞混
+        // get方法发送数据，所以不必填写" postDataType, postData"
+        ajaxReq.send("GET", "blog.xml", handleRequest);
+      }
+
+      // Handle the Ajax request
+      // 这个函数用于处理Ajax request
+      // 这个request用于处理"get"
+      function handleRequest() {
+       /* readyState
+          0: 请求未初始化
+          1: 服务器连接已建立
+          2: 请求已接收
+          3: 请求处理中
+          4: 请求已完成，且响应已就绪
+        */
+        /*status          
+          200: "OK"
+          404: 未找到页面
+        */
+        // 套路，一切就绪
+        if (ajaxReq.getReadyState() == 4 && ajaxReq.getStatus() == 200) {
+          // Store the XML response data
+          // 这里应该是直接定位整个XML文件主体
+          var xmlData = ajaxReq.getResponseXML().getElementsByTagName("blog")[0];
+
+          // Set the blog-wide signature
+          Blog.prototype.signature = "by " + getText(xmlData.getElementsByTagName("author")[0]);
+
+          // Create the array of Blog entry objects
+          // 遍历"blog"中的"entry"
+          var entries = xmlData.getElementsByTagName("entry");
+          for (var i = 0; i < entries.length; i++) {
+            // Create the blog entry
+            // Blog是一个对象
+            // blog是一个数组
+            blog.push(new Blog(getText(entries[i].getElementsByTagName("body")[0]),
+              new Date(getText(entries[i].getElementsByTagName("date")[0])),
+              getText(entries[i].getElementsByTagName("image")[0])));
+          }
+
+          // Enable the blog buttons
+          // 响应完成，可以使三个键正常工作
+          document.getElementById("search").disabled = false;
+          document.getElementById("showall").disabled = false;
+          document.getElementById("viewrandom").disabled = false;
+
+          // Show the blog
+          showBlog(5);
+        }
+      }
+
+      // Show the list of blog entries
+      function showBlog(numEntries) {
+        // First sort the blog
+        blog.sort(Blog.blogSorter);
+
+        // Adjust the number of entries to show the full blog, if necessary
+        if (!numEntries)
+          numEntries = blog.length;
+
+        // Show the blog entries
+        var i = 0, blogListHTML = "";
+        while (i < blog.length && i < numEntries) {
+          blogListHTML += blog[i].toHTML(i % 2 == 0);
+          i++;
+        }
+
+        // Set the blog HTML code on the page
+        // decodeURIComponent() 函数可对 encodeURIComponent() 函数编码的 URI 进行解码
+        document.getElementById("blog").innerHTML = decodeURIComponent(blogListHTML);
+      }
+
+      // Search the list of blog entries for a piece of text
+      function searchBlog() {
+        var searchText = document.getElementById("searchtext").value;
+        for (var i = 0; i < blog.length; i++) {
+          // See if the blog entry contains the search text
+          if (blog[i].containsText(searchText)) {
+            alert(blog[i]);
+            break;
+          }
+        }
+
+        // If the search text wasn't found, display a message
+        if (i == blog.length)
+          alert("Sorry, there are no blog entries containing the search text.");
+      }
+
+      // Display a randomly chosen blog entry
+      function randomBlog() {
+        // Pick a random number between 0 and blog.length - 1
+        var i = Math.floor(Math.random() * blog.length);
+        alert(blog[i]);
+      }
+
+      // Get the text content of an HTML element
+      // 得到一个元素中的文本内容
+      function getText(elem) {
+        var text = "";
+        // 如果这个element存在
+        if (elem) {
+          // 如果这个element存在子节点
+          if (elem.childNodes) {
+            // 遍历子节点
+            for (var i = 0; i < elem.childNodes.length; i++) {
+              var child = elem.childNodes[i];
+              // 如果子节点的有值，将值存入text
+              // 这里的值是<></>之间的文本
+              if (child.nodeValue) text += child.nodeValue;
+              // 如果子节点的没有值
+              else {
+                // 将子节点的第一个子节点的值丢进去
+                // 这里看不懂，子节点没有文本，就将第一个孙节点的文本加进去，什么鬼~
+                if (child.childNodes[0])
+                  if (child.childNodes[0].nodeValue)
+                    text += child.childNodes[0].nodeValue;
+              }
+            }
+          }
+        }
+        return text;
+      }
+    </script>
+  </head>
+
+  <body onload="loadBlog();">
+    <h3>YouCube - The Blog for Cube Puzzlers</h3>
+    <img src="cube.png" alt="YouCube" />
+    <!-- 三个button一开始都是禁用的 -->
+    <input type="button" id="search" value="Search the Blog" disabled="disabled" onclick="searchBlog();" />
+    <input type="text" id="searchtext" name="searchtext" value="" />
+    <!-- 这个div是容器 -->
+    <div id="blog"></div>
+    <input type="button" id="showall" value="Show All Blog Entries" disabled="disabled" onclick="showBlog();" />
+    <input type="button" id="viewrandom" value="View a Random Blog Entry" disabled="disabled" onclick="randomBlog();" />
+  </body>
+</html>
